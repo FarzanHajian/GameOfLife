@@ -1,0 +1,27 @@
+BasedOnStyle: Chromium
+
+IndentWidth: 4
+ColumnLimit: 120
+
+# Make it less cramped
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: true
+
+# Pointer & reference style
+PointerAlignment: Right
+
+# Includes
+SortIncludes: true
+
+# Better wrapping
+BinPackArguments: false
+BinPackParameters: false
+
+# Namespace formatting
+NamespaceIndentation: Inner
+
+# Spacing
+SpaceBeforeParens: ControlStatements
+
+# Keep things readable in templates
+AlwaysBreakTemplateDeclarations: Yes
