@@ -101,6 +101,8 @@ DrawWorld(world);
 EndTextureMode();
 ```
 
+Live cells are drawn with a horizontal gradient fill (blue → dark blue, via `DrawRectangleGradientH`) rather than a flat color.
+
 The resulting texture is then displayed during normal frames:
 
 ```cpp
@@ -138,27 +140,34 @@ This allows the rendering loop to remain responsive while the simulation advance
 
 ## Initial State
 
-The simulation currently starts with a small population placed in a **20 × 20 initial area**.
+The simulation currently starts with a small population placed in a **20 × 20 initial area**, seeded at a random location anywhere on the grid.
 
 The intention is to experiment with different initial configurations and find patterns that produce interesting, long-lived simulations rather than quickly dying out or becoming static.
 
+The same random-pattern logic is reused at runtime — see [Controls](#controls) below.
+
+## Controls
+
+- **Space** — pause or resume the simulation.
+- **Right-click** on the grid — seed a new random 20 × 20 pattern anchored at the clicked cell (its top-left corner), using the same logic that generates the initial population.
+- **A** — toggle Auto Mode. While enabled, a new random 20 × 20 pattern is automatically seeded at a random location every ~200 simulation steps, and an "Auto Mode: ON" indicator is shown on screen.
+
 ## Building
 
-The project uses **CMake**.
+The project uses **CMake**. Raylib is vendored in-repo as a git submodule under `external/raylib`, so it must be checked out before configuring.
 
 Example:
 
 ```bash
+git submodule update --init --recursive
 cmake --preset debug [or release]
 cmake --build build
 ```
-
-Raylib is required as a dependency.
 
 ## Dependencies
 
 - C++20
 - CMake 3.15+
-- Raylib 6.x
+- Raylib 6.x — included as a git submodule (`external/raylib`) and built from source as part of the CMake build, not installed separately
 
 The project has been developed and tested on Windows using Visual Studio's C++ toolchain and VS Code.

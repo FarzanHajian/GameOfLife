@@ -9,8 +9,13 @@
 const int WORLD_ROWS = 100;
 const int WORLD_COLS = 200;
 const double UPDATE_INTERVAL = 0.250;  // 250 ms
+const int AUTO_MODE_INTERVAL = 200;
 const Color GRID_COLOR = LIGHTGRAY;
 const Color MAIN_COLOR = BLUE;
+const Color SECONDARY_COLOR = DARKBLUE;
+
+bool isPaused = false;
+bool isAutoMode = false;
 
 using AppWorld = World<WORLD_ROWS, WORLD_COLS>;
 
@@ -36,8 +41,10 @@ int main() {
 
         if (now - lastUpdate >= UPDATE_INTERVAL) {
             lastUpdate += UPDATE_INTERVAL;
-            world.Next();
-            redraw = true;
+            if (!isPaused) {
+                world.Next();
+                redraw = true;
+            }
         }
 
         if (IsWindowResized()) {
@@ -46,8 +53,37 @@ int main() {
             redraw = true;
         }
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+            Vector2 mouse = GetMousePosition();
+
+            int width = GetScreenWidth();
+            int height = GetScreenHeight();
+
+            float rowSpan = height / static_cast<float>(WORLD_ROWS);
+            float colSpan = width / static_cast<float>(WORLD_COLS);
+
+            int row = static_cast<int>(mouse.y / rowSpan);
+            int col = static_cast<int>(mouse.x / colSpan);
+
+            world.AddInitialPattern(row, col);
+
+            redraw = true;
+        }
+
+        if (IsKeyReleased(KEY_SPACE)) {
+            isPaused = !isPaused;
+        }
+
+        if (IsKeyReleased(KEY_A)) {
+            isAutoMode = !isAutoMode;
+        }
+
         if (redraw) {
             iteration++;
+
+            if (isAutoMode && !(iteration % AUTO_MODE_INTERVAL)) {
+                world.AddInitialPattern();
+            }
 
             float rowSpan, colSpan;
             BeginTextureMode(worldTexture);
@@ -69,6 +105,7 @@ int main() {
                        WHITE);
 
         DrawText(TextFormat("Iteration: %d", iteration), 10, 10, 20, MAIN_COLOR);
+        if (isAutoMode) DrawText("Auto Mode: ON", 10, 40, 20, MAIN_COLOR);
 
         EndDrawing();
     }
@@ -102,7 +139,7 @@ void DrawWorld(AppWorld &world, const float &rowSpan, const float &colSpan) {
             auto [quotient, remainder] = std::div(i, WORLD_COLS);
             float x = remainder * colSpan;
             float y = quotient * rowSpan;
-            DrawRectangle(x, y, colSpan + 1, rowSpan + 1, MAIN_COLOR);
+            DrawRectangleGradientH(x, y, colSpan + 1, rowSpan + 1, MAIN_COLOR, SECONDARY_COLOR);
         }
     }
 }

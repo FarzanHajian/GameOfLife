@@ -4,9 +4,11 @@
 #ifndef _WORLD_H_
 #define _WORLD_H_
 
+#include <algorithm>
 #include <array>
 #include <bitset>
 #include <cstdlib>
+#include <fstream>
 #include <random>
 
 template <int ROWS, int COLS>
@@ -59,6 +61,8 @@ class World {
         int row = 0, col = 0;
         int above = -COLS, below = COLS;
         for (size_t cell = 0; cell < _world.size(); cell++) {
+            std::fill(std::begin(neighbors), std::end(neighbors), -1);
+
             if (cell == TOP_LEFT) {
                 neighbors[4] = 1;
                 neighbors[6] = COLS;
@@ -138,27 +142,37 @@ class World {
             _world.reset(cell);
     }
 
-   private:
-    void AddInitialPattern() {
+    void AddInitialPattern(int startingRow = -1, int startingCol = -1) {
         int initialPatternSize = 20;
         int cellCount = initialPatternSize * initialPatternSize;
-        int xPadding = COLS / 4;
-        int yPadding = ROWS / 4;
-        std::uniform_int_distribution<int> rowDist(yPadding, ROWS - yPadding - 1);
-        std::uniform_int_distribution<int> colDist(xPadding, COLS - xPadding - 1);
+
+        if (startingRow == -1) {
+            std::uniform_int_distribution<int> rowDist(0, ROWS - initialPatternSize);
+            startingRow = rowDist(_rnd);
+        } else {
+            startingRow = std::max(0, startingRow);
+            startingRow = std::min(startingRow, ROWS - initialPatternSize);
+        }
+
+        if (startingCol == -1) {
+            std::uniform_int_distribution<int> colDist(0, COLS - initialPatternSize);
+            startingCol = colDist(_rnd);
+        } else {
+            startingCol = std::max(0, startingCol);
+            startingCol = std::min(startingCol, COLS - initialPatternSize);
+        }
+
         std::uniform_int_distribution<int> countDist(cellCount / 4, cellCount / 2);
         std::uniform_int_distribution<int> cellDist(0, cellCount - 1);
 
-        int startingRow = rowDist(_rnd);
-        int startingCol = colDist(_rnd);
         int startingCount = countDist(_rnd);
-        int startingPoint = ((startingRow - 1) * COLS) + startingCol;
+        int topLeftCell = (startingRow * COLS) + startingCol;
         for (int i = 0; i < startingCount; i++) {
             while (true) {
                 int cell = cellDist(_rnd);
                 auto [quotient, remainder] = std::div(cell, initialPatternSize);
-                int offset = (remainder == 0 ? initialPatternSize : remainder);
-                int index = startingPoint + (quotient * COLS) + offset;
+                int offset = (remainder == 0 ? initialPatternSize : remainder) - 1;
+                int index = topLeftCell + (quotient * COLS) + offset;
                 if (!_world.test(index)) {
                     _world.set(index);
                     break;
