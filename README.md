@@ -160,7 +160,7 @@ Example:
 
 ```bash
 git submodule update --init --recursive
-cmake --preset debug [or release]
+cmake --preset debug [or release or debug-wayland or release-wayland]
 cmake --build build
 ```
 
@@ -170,4 +170,6 @@ cmake --build build
 - CMake 3.15+
 - Raylib 6.x — included as a git submodule (`external/raylib`) and built from source as part of the CMake build, not installed separately
 
-The project has been developed and tested on Windows using Visual Studio's C++ toolchain and VS Code.
+The project has been developed and tested on
+- Windows 11 + Visual Studio's C++ toolchain + Ninja + VS Code
+- Fedora 44 KDE + GCC + Ninja + VS Code

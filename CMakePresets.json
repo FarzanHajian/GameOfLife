@@ -3,10 +3,45 @@
     "configurePresets": [
         {
             "name": "vcpkg+ninja",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build",
+            "binaryDir": "${sourceDir}/build"
+        },
+        {
+            "name": "wayland",
+            "hidden": true,
+            "inherits": "vcpkg+ninja",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                "GLFW_BUILD_WAYLAND": "ON",
+                "GLFW_BUILD_X11": "OFF"
+            }
+        },
+        {
+            "name": "debug",
+            "inherits": "vcpkg+ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "vcpkg+ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "debug-wayland",
+            "inherits": "wayland",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release-wayland",
+            "inherits": "wayland",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ]
